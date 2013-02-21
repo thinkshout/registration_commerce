@@ -1,0 +1,6 @@
+name = Registration Commerce
+description = Commerce integrations for registration module
+package = Registration
+core = 7.x
+
+dependencies[] = registration
