@@ -108,8 +108,7 @@ function registration_commerce_set_state($order, $registration_state) {
   foreach (entity_metadata_wrapper('commerce_order', $order)->commerce_line_items as $delta => $line_item_wrapper) {
     if ($line_item_wrapper->type->value() == 'registration') {
       $registration = registration_load($line_item_wrapper->{REGISTRATION_COMMERCE_FIELD}->registration_id->value());
-      $key = array_keys($registration_state);
-      $registration->state = $registration_state[$key[0]];
+      $registration->state = $registration_state;
       registration_save($registration);
     }
   }
