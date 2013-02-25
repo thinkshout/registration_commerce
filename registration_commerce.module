@@ -542,7 +542,26 @@ function registration_commerce_form_alter(&$form, &$form_state, $form_id) {
       if (is_array($qty)) {
         $line_item = commerce_line_item_load($qty['#line_item_id']);
         if ($line_item->type == 'registration') {
-          $qty['#disabled'] = TRUE;
+          $reg = registration_load($line_item->registration_commerce_reg['und'][0]['target_id']);
+          $markup = '';
+          foreach($reg->field_tickets['und'] as $item) {
+            $markup .= $item['quantity'] . ' ' . $item['type'] . '<br />';
+          }
+          $qty = array(
+            'registrations' => array(
+              '#type' => 'markup',
+              '#markup' => $markup,
+            ),
+            'edit' => array(
+              '#theme' => 'link',
+              '#text' => 'edit',
+              '#path' => 'registration/' . $reg->registration_id . "/edit",
+              '#options' => array(
+                'attributes' => array('title' => 'edit registrations',),
+                'query' => array('destination' => 'cart'),
+                'html' => FALSE,),
+            ),
+          );
         }
       }
     }
