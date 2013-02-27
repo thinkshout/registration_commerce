@@ -538,16 +538,19 @@ function registration_commerce_cart_registration_add($uid, $line_item) {
 function registration_commerce_form_alter(&$form, &$form_state, $form_id) {
   // On the view cart page, disable the edit quantity textfield for registrations and donations
   if ($form_id == 'views_form_commerce_cart_form_default') {
-    foreach ($form['edit_quantity'] as &$qty) {
+    $form['edit_tickets'] = array('#tree' => 'true');
+    foreach ($form['edit_quantity'] as $row => &$qty) {
       if (is_array($qty)) {
         $line_item = commerce_line_item_load($qty['#line_item_id']);
         if ($line_item->type == 'registration') {
+          $qty['#type'] = 'hidden';
           $reg = registration_load($line_item->registration_commerce_reg['und'][0]['target_id']);
           $markup = '';
           foreach($reg->field_tickets['und'] as $item) {
-            $markup .= $item['quantity'] . ' ' . $item['type'] . '<br />';
+            if ($item['quantity'] > 0)
+              $markup .= $item['quantity'] . ' ' . $item['type'] . '<br />';
           }
-          $qty = array(
+          $form['edit_tickets'][] = array(
             'registrations' => array(
               '#type' => 'markup',
               '#markup' => $markup,
@@ -562,6 +565,11 @@ function registration_commerce_form_alter(&$form, &$form_state, $form_id) {
                 'html' => FALSE,),
             ),
           );
+          foreach ($form['#substitutions']['#value'] as &$substitution) {
+            if ($substitution['field_name'] == "edit_quantity" && $row == $substitution['row_id']) {
+              $substitution['field_name'] = "edit_tickets";
+            }
+          }
         }
       }
     }
