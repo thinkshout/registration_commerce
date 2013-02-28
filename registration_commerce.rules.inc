@@ -10,8 +10,8 @@
 function registration_commerce_rules_condition_info() {
   $conditions = array();
 
-  $conditions['registration_commerce_item_has_registration_capacity'] = array(
-    'label' => t('Registration referenced by line item can be made active'),
+  $conditions['registration_commerce_item_can_register'] = array(
+    'label' => t('Registration referenced by a line item is available for registration.'),
     'group' => t('Registration'),
     'parameter' => array(
       'commerce_line_item' => array(
@@ -74,7 +74,7 @@ function registration_commerce_rules_action_info() {
  */
 function registration_commerce_item_can_register($line_item) {
   $line_item_wrapper = entity_metadata_wrapper('commerce_line_item', $line_item);
-  if ($line_item_wrapper->type->value() != 'registration') {
+  if ($line_item->type != 'registration') {
     return FALSE;
   }
 

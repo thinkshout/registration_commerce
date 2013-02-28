@@ -542,7 +542,7 @@ function registration_commerce_form_alter(&$form, &$form_state, $form_id) {
       if (is_array($qty)) {
         $line_item = commerce_line_item_load($qty['#line_item_id']);
         if ($line_item->type == 'registration') {
-          $qty['#disabled'] = 'true';
+          $qty['#disabled'] = TRUE;
         }
       }
     }
