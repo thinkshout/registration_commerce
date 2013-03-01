@@ -75,7 +75,7 @@ function registration_commerce_rules_action_info() {
 function registration_commerce_item_can_register($line_item) {
   $line_item_wrapper = entity_metadata_wrapper('commerce_line_item', $line_item);
   if ($line_item->type != 'registration') {
-    return FALSE;
+    return TRUE;
   }
 
   $status = registration_status(
