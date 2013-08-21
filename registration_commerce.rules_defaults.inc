@@ -23,16 +23,21 @@ function registration_commerce_default_rules_configuration() {
     'field' => REGISTRATION_COMMERCE_FIELD,
   ))
     ->condition('data_is', array(
-    'data:select' => 'commerce-line-item:registration-commerce-reg:price',
+    'data:select' => 'commerce-line-item:registration-commerce-reg:amount',
     'op' => '>',
     'value' => '0',
   ))
     ->action('commerce_line_item_unit_price_amount', array(
-    'commerce_line_item:select' => 'commerce-line-item',
-    'amount:select' => 'commerce-line-item:registration-commerce-reg:price',
-    'component_name' => 'base_price',
-    'round_mode' => '1',
-  ));
+      'commerce_line_item:select' => 'commerce-line-item',
+      'amount:select' => 'commerce-line-item:registration-commerce-reg:amount',
+      'component_name' => 'base_price',
+      'round_mode' => '1',
+  ))
+    ->action('commerce_line_item_unit_price_currency_code', array(
+      'commerce_line_item:select' => 'commerce-line-item',
+      'currency_code:select' => 'commerce-line-item:registration-commerce-reg:currency',
+  ))
+  ;
 
   $rules['registration_commerce_product_price_from_registration'] = $rule;
 
