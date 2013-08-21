@@ -38,6 +38,7 @@ function registration_commerce_entity_property_info() {
 
   return $info;
 }
+
 /**
  * Implements hook_menu().
  */
@@ -54,6 +55,20 @@ function registration_commerce_menu() {
   );
 
   return $items;
+}
+
+/**
+ * Implements hook_permission().
+ */
+function registration_commerce_permission() {
+  $permissions = array();
+
+  $permissions['registration_commerce_pay_any_registration'] = array(
+    'title' => t('Pay for any registration product'),
+    'description' => t("Allows adding any registration product in a proper status to the user's cart, regardless of who the registration belongs to."),
+  );
+
+  return $permissions;
 }
 
 /**
@@ -132,7 +147,7 @@ function registration_commerce_registration_submit($form, &$form_state) {
 }
 
 /**
- * Helper to add a specific registration to the current user's cart
+ * Helper to add a specific registration to the current user's cart.
  */
 function registration_commerce_add_to_cart($registration) {
   if (registration_commerce_pay_access($registration)) {
@@ -144,7 +159,7 @@ function registration_commerce_add_to_cart($registration) {
 }
 
 /**
- * Access callback for to check if current user can pay for a given registration
+ * Access callback to check if current user can pay for a given registration.
  */
 function registration_commerce_pay_access($registration) {
   $registration_wrapper = entity_metadata_wrapper('registration', $registration);
@@ -156,9 +171,15 @@ function registration_commerce_pay_access($registration) {
   $pending_states  = array('pending');
 
   $registration_price = $registration_wrapper->price->value();
-  // if the registration state is pending payment, the parent event has a price
-  if (in_array($registration->state, $pending_states) && $registration_price['amount'] > 0
-    && ($registration->author_uid == $GLOBALS['user']->uid || $registration->user_uid == $GLOBALS['user']->uid) ) {
+  $user = $GLOBALS['user'];
+  // If the registration state is pending payment, the parent event has a price.
+  if ($registration->author_uid == $user->uid || $registration->user_uid == $user->uid) {
+    $user_allowed_to_access = TRUE;
+  }
+  else {
+    $user_allowed_to_access = user_access('registration_commerce_pay_any_registration', $user);
+  }
+  if ($user_allowed_to_access && in_array($registration->state, $pending_states) && $registration_price['amount'] > 0) {
     return TRUE;
   }
 
@@ -362,7 +383,6 @@ function registration_commerce_line_item_populate($line_item, $registration) {
   $price = $registration_wrapper->price->value();
 
   $line_item_wrapper->commerce_unit_price->set($price);
-
   if (!is_null($line_item_wrapper->commerce_unit_price->value())) {
     // Add the base price to the components array.
     if (!commerce_price_component_load($line_item_wrapper->commerce_unit_price->value(), 'base_price')) {
