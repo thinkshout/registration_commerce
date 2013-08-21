@@ -95,9 +95,8 @@ function registration_commerce_admin_access() {
 /**
  * Implements hook_commerce_line_item_type_info().
  *
- * @see hook_commerce_line_item_type_info().
+ * @see hook_commerce_line_item_type_info()
  * @see http://www.drupalcommerce.org/specification/info-hooks/checkout
- *
  */
 function registration_commerce_commerce_line_item_type_info() {
 
@@ -139,7 +138,7 @@ function registration_commerce_entity_view($entity, $type, $view_mode, $langcode
 }
 
 /**
- * Implements hook_form_alter().
+ * Implements hook_form_FORM_ID_alter().
  */
 function registration_commerce_form_registration_form_alter(&$form, &$form_state, $form_id) {
   // If current user has extra permissions, let them opt out of adding to cart & redirect
