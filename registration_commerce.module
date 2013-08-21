@@ -11,7 +11,7 @@ function registration_commerce_entity_property_info() {
 
   $properties['price'] = array(
     'label' => t('Price'),
-    'type' => 'integer',
+    'type' => 'struct',
     'description' => t('The price for this registration.'),
     'getter callback' => 'registration_commerce_registration_price_get',
     'computed' => TRUE,
@@ -63,11 +63,13 @@ function registration_commerce_commerce_line_item_type_info() {
 function registration_commerce_entity_view($entity, $type, $view_mode, $langcode) {
   if ($type == 'registration') {
     $wrapper = entity_metadata_wrapper('registration', $entity);
+    $price = $wrapper->price->value();
+    $price_markup = commerce_currency_format($price['amount'], $price['currency_code']);
     $entity->content['price'] = array(
       '#type' => 'item',
       '#weight' => 98,
       '#title' => t('Price'),
-      '#markup' => t('$') . number_format($wrapper->price->value()/100, 2),
+      '#markup' => $price_markup,
     );
     if (registration_commerce_pay_access($entity)) {
       $uri = entity_uri('registration', $entity);
@@ -136,7 +138,7 @@ function registration_commerce_pay_access($registration) {
 
   $registration_price = $registration_wrapper->price->value();
   // if the registration state is pending payment, the parent event has a price
-  if (in_array($registration->state, $pending_states) && $registration_price > 0
+  if (in_array($registration->state, $pending_states) && $registration_price['amount'] > 0
     && ($registration->author_uid == $GLOBALS['user']->uid || $registration->user_uid == $GLOBALS['user']->uid) ) {
     return TRUE;
   }
@@ -338,10 +340,7 @@ function registration_commerce_line_item_populate($line_item, $registration) {
   // Set the unit price on the line item object if the product has a value in
   // its commerce_price field.
 
-  $price = array(
-    'amount' => $registration_wrapper->price->value(),
-    'currency_code' => commerce_default_currency(),
-  );
+  $price = $registration_wrapper->price->value();
 
   $line_item_wrapper->commerce_unit_price->set($price);
 
@@ -550,12 +549,17 @@ function registration_commerce_form_alter(&$form, &$form_state, $form_id) {
 
 /**
  * Entity metadata getter callback for the registration price.
+ * 
+ * Returns an array formatted as a standard commerce price object.
  */
-function registration_commerce_registration_price_get($data, array $options, $name, $type, $info) {
-  // @todo replace with some generic price handling. A setting from the registration type settings?
-  $result = module_invoke_all('_registration_commerce_calculate_price', $data, $options, $name, $type, $info);
-  if (isset($result['price'])) {
-    return $result['price'];
+function registration_commerce_registration_price_get($data, $info) {
+  $result = module_invoke_all('registration_commerce_calculate_price', $data, $info);
+  if (!isset($result['amount'])) {
+    $result = array(
+      'amount' => 0,
+      'currency_code' => commerce_default_currency(),
+    );
   }
-  return 0;
+  // @todo more sensible generic price handling. A setting from the registration type settings?
+  return $result;
 }
