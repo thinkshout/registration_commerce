@@ -54,6 +54,15 @@ function registration_commerce_menu() {
     'access arguments' => array(1),
   );
 
+  $items['admin/structure/registration/registration_types/manage/%registration_type/registration_commerce'] = array(
+    'title' => 'Registration Commerce Settings',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('registration_commerce_registration_type_form', 5),
+    'access callback' => 'registration_commerce_admin_access',
+    'file' => 'includes/registration_commerce.forms.inc',
+    'type' => MENU_LOCAL_TASK,
+  );
+
   return $items;
 }
 
@@ -63,12 +72,24 @@ function registration_commerce_menu() {
 function registration_commerce_permission() {
   $permissions = array();
 
+  $permissions['registration_commerce_administer'] = array(
+    'title' => t('Administer Registration Commerce'),
+    'description' => t("Allows adding any registration product in a proper status to the user's cart, regardless of who the registration belongs to."),
+    'restrict access' => TRUE,
+  );
   $permissions['registration_commerce_pay_any_registration'] = array(
     'title' => t('Pay for any registration product'),
     'description' => t("Allows adding any registration product in a proper status to the user's cart, regardless of who the registration belongs to."),
   );
 
   return $permissions;
+}
+
+/**
+ * Access callback for administrative pages.
+ */
+function registration_commerce_admin_access() {
+  return user_access('registration_commerce_administer', $GLOBALS['user']);
 }
 
 /**
@@ -167,8 +188,7 @@ function registration_commerce_pay_access($registration) {
   $entity = entity_metadata_wrapper('registration', $registration)->entity->value();
   $entity_wrapper = entity_metadata_wrapper($registration->entity_type, $entity);
 
-  // @todo: make configurable
-  $pending_states  = array('pending');
+  $purchasable_states = variable_get('commerce_registration_type_settings', array());
 
   $registration_price = $registration_wrapper->price->value();
   $user = $GLOBALS['user'];
@@ -179,7 +199,7 @@ function registration_commerce_pay_access($registration) {
   else {
     $user_allowed_to_access = user_access('registration_commerce_pay_any_registration', $user);
   }
-  if ($user_allowed_to_access && in_array($registration->state, $pending_states) && $registration_price['amount'] > 0) {
+  if ($user_allowed_to_access && !empty($purchasable_states[$registration->content['#bundle']][$registration->state]) && $registration_price['amount'] > 0) {
     return TRUE;
   }
 
