@@ -19,7 +19,6 @@ function registration_commerce_entity_property_info() {
   );
   return $info;
 }
-
 /**
  * Implements hook_menu().
  */
@@ -59,7 +58,7 @@ function registration_commerce_commerce_line_item_type_info() {
 }
 
 /**
- * Implements hook_entity_view()
+ * Implements hook_entity_view().
  */
 function registration_commerce_entity_view($entity, $type, $view_mode, $langcode) {
   if ($type == 'registration') {
@@ -74,8 +73,8 @@ function registration_commerce_entity_view($entity, $type, $view_mode, $langcode
       $uri = entity_uri('registration', $entity);
       $entity->content['pay_link'] = array(
         '#weight' => 99,
-        '#markup' => l('Add registration to cart', $uri['path'] . '/pay', array(
-          'attributes' => array('classes' => array('button'))
+        '#markup' => l(t('Add registration to cart'), $uri['path'] . '/pay', array(
+          'attributes' => array('classes' => array('button')),
         )),
       );
     }
