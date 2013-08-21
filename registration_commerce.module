@@ -17,6 +17,25 @@ function registration_commerce_entity_property_info() {
     'computed' => TRUE,
     'entity views field' => TRUE,
   );
+
+  $properties['amount'] = array(
+    'label' => t('Amount'),
+    'type' => 'decimal',
+    'description' => t('The decimal amount piece of the Price.'),
+    'getter callback' => 'registration_commerce_registration_amount_get',
+    'computed' => TRUE,
+    'entity views field' => TRUE,
+  );
+
+  $properties['currency'] = array(
+    'label' => t('Currency'),
+    'type' => 'text',
+    'description' => t('The currency piece of the Price.'),
+    'getter callback' => 'registration_commerce_registration_currency_get',
+    'computed' => TRUE,
+    'entity views field' => TRUE,
+  );
+
   return $info;
 }
 /**
@@ -562,4 +581,15 @@ function registration_commerce_registration_price_get($data, $info) {
   }
   // @todo more sensible generic price handling. A setting from the registration type settings?
   return $result;
+}
+
+function registration_commerce_registration_amount_get($data, $info) {
+  $price = registration_commerce_registration_price_get($data, $info);
+  return $price['amount'];
+}
+
+
+function registration_commerce_registration_currency_get($data, $info) {
+  $price = registration_commerce_registration_price_get($data, $info);
+  return $price['currency_code'];
 }
