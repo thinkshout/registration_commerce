@@ -66,5 +66,34 @@ function registration_commerce_default_rules_configuration() {
 
   $rules['registration_commerce_unset_unavailable_registration'] = $rule;
 
+  $rule = rules_reaction_rule();
+
+  $rule->label = t('Assert that no other cart contains this registration product');
+  $rule->active = FALSE;
+  $rule->weight = 0;
+  $rule->tags = array("Commerce Cart", "Registration Commerce");
+  $rule
+    ->event('commerce_line_item_presave')
+    ->condition('entity_has_field', array(
+      'entity:select' => 'commerce-line-item',
+      'field' => REGISTRATION_COMMERCE_FIELD,
+    ))
+    ->condition(rules_condition('registration_commerce_registration_has_extant_line_item', array(
+      'data:select' => 'commerce-line-item',
+    )))
+    ->action('drupal_message', array(
+      'message' => t("This item cannot be added to your cart: it is already in another user's cart."),
+      'type' => 'error',
+      'repeat' => FALSE,
+    ))
+    ->action('entity_delete', array(
+      'data:select' => 'commerce-line-item',
+    ))
+    ->action('redirect', array(
+      'url:select' => 'commerce-line-item-unchanged:registration-commerce-reg:url',
+    ));
+
+  $rules['rules_assert_registration_product_line_item_uniqueness'] = $rule;
+
   return $rules;
 }
