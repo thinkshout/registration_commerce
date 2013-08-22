@@ -198,7 +198,7 @@ function registration_commerce_pay_access($registration) {
   else {
     $user_allowed_to_access = user_access('registration_commerce_pay_any_registration', $user);
   }
-  if ($user_allowed_to_access && !empty($purchasable_states[$registration->content['#bundle']][$registration->state]) && $registration_price['amount'] > 0) {
+  if ($user_allowed_to_access && !empty($purchasable_states[$registration->type][$registration->state]) && $registration_price['amount'] > 0) {
     return TRUE;
   }
 
