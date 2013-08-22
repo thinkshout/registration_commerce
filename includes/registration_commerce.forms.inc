@@ -31,7 +31,7 @@ function registration_commerce_registration_type_form($form, &$form_state, $regi
   $form['price_defaults']['amount'] = array(
     '#type' => 'textfield',
     '#title' => t('Amount'),
-    '#default_value' => isset($defaults['price_defaults']['amount']) ? $defaults['price_defaults']['amount'] : 0,
+    '#default_value' => isset($defaults['price_defaults']['amount']) ? $defaults['price_defaults']['amount'] / 100 : 0,
     '#element_validate' => array('element_validate_number'),
   );
   $form['price_defaults']['currency_code'] = array(
