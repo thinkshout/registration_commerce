@@ -525,12 +525,11 @@ function registration_commerce_registration_reference_create_instance($field_nam
 }
 
 /**
- * Add a registration line item to a user's cart
+ * Add a registration line item to a user's cart.
  */
 function registration_commerce_cart_registration_add($uid, $line_item) {
   // Do not add the line item if it doesn't have a unit price.
   $line_item_wrapper = entity_metadata_wrapper('commerce_line_item', $line_item);
-
   if (is_null($line_item_wrapper->commerce_unit_price->value())) {
     return FALSE;
   }
@@ -631,4 +630,17 @@ function registration_commerce_registration_amount_get($data, $info) {
 function registration_commerce_registration_currency_get($data, $info) {
   $price = registration_commerce_registration_price_get($data, $info);
   return $price['currency_code'];
+}
+
+/**
+ * Implements hook_entity_delete().
+ * 
+ * We need to clean up this registration field ourselves because it isn't
+ * happening otherwise, and creates strange results in our rules checking for
+ * existing line items for registrations.
+ */
+function registration_commerce_entity_delete($entity, $type) {
+  if ($type == 'commerce_line_item' && $entity->type == 'registration') {
+    db_delete(REGISTRATION_COMMERCE_FIELD, array('entity_id' => $entity->line_item_id));
+  }
 }
