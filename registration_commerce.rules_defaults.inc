@@ -69,7 +69,7 @@ function registration_commerce_default_rules_configuration() {
   $rule = rules_reaction_rule();
 
   $rule->label = t('Assert that no other cart contains this registration product');
-  $rule->active = FALSE;
+  $rule->active = TRUE;
   $rule->weight = 0;
   $rule->tags = array("Commerce Cart", "Registration Commerce");
   $rule

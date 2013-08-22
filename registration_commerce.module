@@ -625,12 +625,21 @@ function registration_commerce_registration_price_get($data, $info) {
   return $result;
 }
 
+/**
+ * Entity metadata callback for the amount property.
+ * 
+ * This exists specifically for use with rules.
+ */
 function registration_commerce_registration_amount_get($data, $info) {
   $price = registration_commerce_registration_price_get($data, $info);
   return $price['amount'];
 }
 
-
+/**
+ * Entity metadata callback for the currency property.
+ *
+ * This exists specifically for use with rules.
+ */
 function registration_commerce_registration_currency_get($data, $info) {
   $price = registration_commerce_registration_price_get($data, $info);
   return $price['currency_code'];
