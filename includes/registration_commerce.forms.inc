@@ -22,6 +22,24 @@ function registration_commerce_registration_type_form($form, &$form_state, $regi
     $defaults = array();
   }
 
+  $form['price_defaults'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Default Price Settings'),
+    '#collapsible' => FALSE,
+    '#tree' => TRUE,
+  );
+  $form['price_defaults']['amount'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Amount'),
+    '#default_value' => isset($defaults['price_defaults']['amount']) ? $defaults['price_defaults']['amount'] : 0,
+    '#element_validate' => array('element_validate_number'),
+  );
+  $form['price_defaults']['currency_code'] = array(
+    '#type' => 'select',
+    '#title' => t('Currency'),
+    '#options' => commerce_currency_code_options_list(),
+    '#default_value' => isset($defaults['price_defaults']['currency_code']) ? $defaults['price_defaults']['currency_code'] : commerce_default_currency(),
+  );
   // Load the current registration states to update the form options:
   $states = registration_get_states();
   $options = array();
@@ -33,7 +51,7 @@ function registration_commerce_registration_type_form($form, &$form_state, $regi
       array('@label' => $registration_type->label)),
     '#type' => 'checkboxes',
     '#options' => $options,
-    '#default_value' => $defaults,
+    '#default_value' => $defaults['purchasable_states'],
   );
 
   $form['actions'] = array('#type' => 'actions');
@@ -58,7 +76,11 @@ function registration_commerce_registration_type_form_validate($form, &$form_sta
 function registration_commerce_registration_type_form_submit($form, &$form_state) {
   // @todo should this be stored in the variable table or somewhere else?
   $settings = variable_get('commerce_registration_type_settings', array());
-  $settings[$form_state['registration_type_bundle']] = $form_state['values']['purchasable_states'];
+  $settings[$form_state['registration_type_bundle']] = array(
+    'price_defaults' => $form_state['values']['price_defaults'],
+    'purchasable_states' => $form_state['values']['purchasable_states'],
+  );
+  $settings[$form_state['registration_type_bundle']]['price_defaults']['amount'] *= 100;
   variable_set('commerce_registration_type_settings', $settings);
   drupal_set_message(t('Registration Commerce settings have been saved.'));
 }
