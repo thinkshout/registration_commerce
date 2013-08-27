@@ -25,21 +25,6 @@ function registration_commerce_rules_condition_info() {
     ),
   );
 
-  $conditions['registration_commerce_registration_has_extant_line_item'] = array(
-    'label' => t('Registration is contained in any other cart.'),
-    'group' => t('Registration'),
-    'parameter' => array(
-      'commerce_line_item' => array(
-        'type' => 'commerce_line_item',
-        'label' => t('Commerce Line Item'),
-        'description' => t('The Line Item to compare for duplicates.'),
-      ),
-    ),
-    'callbacks' => array(
-      'execute' => 'registration_commerce_registration_has_extant_line_item',
-    ),
-  );
-
   return $conditions;
 }
 
@@ -75,36 +60,6 @@ function registration_commerce_rules_action_info() {
  * @{
  * Condition callbacks for Registration Commerce Registration rules.
  */
-
-/**
- * Condition callback.
- *
- * Checks if any carts contain a line item matching this registration.
- *
- * @param Registration $registration
- *
- * @return int
- *   Returns the ID of another order containing this item, or 0
- */
-function registration_commerce_registration_has_extant_line_item($line_item) {
-  $query = new EntityFieldQuery();
-  $query->entityCondition('entity_type', 'commerce_line_item')
-    ->entityCondition('bundle', 'registration')
-    // Avoid a false positive on this line item:
-    ->entityCondition('entity_id', $line_item->line_item_id, '!=')
-    // todo: use wrapper:
-    ->fieldCondition(REGISTRATION_COMMERCE_FIELD, 'target_id', $line_item->{REGISTRATION_COMMERCE_FIELD}['und'][0]['target_id'], '=')
-    ->addMetaData('account', user_load(1));
-
-  $result = $query->execute();
-  if (empty($result)) {
-    return 0;
-  }
-  $first_result = array_shift($result['commerce_line_item']);
-  $extant_line_item = commerce_line_item_load($first_result->line_item_id);
-  // Now we have all the line items that point to this registration.
-  return $extant_line_item->order_id;
-}
 
 /**
  * Condition callback.
