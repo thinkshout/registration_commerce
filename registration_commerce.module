@@ -74,7 +74,7 @@ function registration_commerce_permission() {
 
   $permissions['registration_commerce_administer'] = array(
     'title' => t('Administer Registration Commerce'),
-    'description' => t("Allows adding any registration product in a proper status to the user's cart, regardless of who the registration belongs to."),
+    'description' => t("Allows access to the Registration Commerce configuration tab on Registration Types."),
     'restrict access' => TRUE,
   );
   $permissions['registration_commerce_pay_any_registration'] = array(
