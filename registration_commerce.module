@@ -221,8 +221,25 @@ function registration_commerce_pay_page_access($registration) {
  * Page callback for adding a registration to the current user's cart
  */
 function registration_commerce_pay_callback($registration) {
+  // Check to see if this registration is already in someone's cart:
+  $query = new EntityFieldQuery();
+  $query->entityCondition('entity_type', 'commerce_line_item')
+    ->entityCondition('bundle', 'registration')
+    // Avoid a false positive on this line item:
+    // ->entityCondition('entity_id', $line_item->line_item_id, '!=')
+    // todo: use wrapper:
+    ->fieldCondition(REGISTRATION_COMMERCE_FIELD, 'target_id', $registration->registration_id, '=')
+    ->addMetaData('account', user_load(1));
 
-  if (!registration_commerce_add_to_cart($registration)) {
+  $result = $query->execute();
+  if (!empty($result)) {
+    // A duplicate has been found, get the Cart ID to add to the status message:
+    $first_result = array_shift($result['commerce_line_item']);
+    $extant_line_item = commerce_line_item_load($first_result->line_item_id);
+    drupal_set_message(t('Unable to add this registration to your cart because it is in another cart (Order ID: @cart_id).', array('@cart_id' => $extant_line_item->order_id)), 'status');
+  }
+  // Now we try to add the item to the cart:
+  elseif (!registration_commerce_add_to_cart($registration)) {
     drupal_set_message(t('Unable to add this registration to your cart. It may already be in your cart.'), 'status');
   }
 
