@@ -258,8 +258,8 @@ function registration_commerce_line_item_title($line_item) {
 }
 
 /**
- * Returns the elements necessary to add a registration line item through a line item
- * manager widget.
+ * Returns the elements necessary to add a registration line item through a line
+ * item manager widget.
  */
 function registration_commerce_line_item_add_form($element, &$form_state) {
   $form = array();

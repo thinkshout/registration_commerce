@@ -1,17 +1,24 @@
 <?php
+
+/**
+ * @file
+ * Install, update, & uninstall functions for the registration_commerce module.
+ */
+
 /**
  * Implements hook_enable().
  */
 function registration_commerce_enable() {
 
-  // Create a simple product to be used as the referenced product on registration line items
+  // Create a simple product to be used as the referenced product on
+  // registration line items:
   if (!variable_get('registration_commerce_product', FALSE)) {
     $form_state = array();
     $form_state['values'] = array();
     $form = array();
     $form['#parents'] = array();
 
-    // Generate a new product object
+    // Generate a new product object:
     $new_product = commerce_product_new('product');
 
     $new_product->status = TRUE;
@@ -21,14 +28,18 @@ function registration_commerce_enable() {
     $new_product->title = t('Registration');
     $new_product->created = $new_product->changed = time();
 
-    //commerce_price[und][0][amount]
-    $price = array(LANGUAGE_NONE => array(0 => array(
-      'amount' => 0,
-      'currency_code' => commerce_default_currency(),
-    )));
+    // commerce_price[und][0][amount].
+    $price = array(
+      LANGUAGE_NONE => array(
+        0 => array(
+          'amount' => 0,
+          'currency_code' => commerce_default_currency(),
+        ),
+      ),
+    );
     $form_state['values']['commerce_price'] = $price;
 
-    // Notify field widgets to save their field data
+    // Notify field widgets to save their field data:
     field_attach_submit('commerce_product', $new_product, $form, $form_state);
 
     commerce_product_save($new_product);
