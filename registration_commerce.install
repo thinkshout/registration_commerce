@@ -47,3 +47,37 @@ function registration_commerce_enable() {
     variable_set('registration_commerce_product', $new_product->product_id);
   }
 }
+
+/**
+ * Implements hook_schema_alter().
+ */
+function registration_commerce_schema_alter(&$schema) {
+  // Add registration_commerce_settings blob to existing registration schema.
+  $schema['registration_type']['fields']['registration_commerce_settings'] = array(
+    'type' => 'blob',
+    'default' => NULL,
+    'description' => 'Configuration options for Registration Commerce.',
+  );
+}
+
+/**
+ * Implements hook_install().
+ */
+function registration_commerce_install() {
+  $new_schema = array();
+  registration_commerce_schema_alter($new_schema);
+  foreach ($new_schema['registration_type']['fields'] as $name => $spec) {
+    db_add_field('registration_type', $name, $spec);
+  }
+}
+
+/**
+ * Implements hook_uninstall().
+ */
+function registration_commerce_uninstall() {
+  $new_schema = array();
+  registration_commerce_schema_alter($new_schema);
+  foreach ($new_schema['registration_type']['fields'] as $name => $spec) {
+    db_drop_field('registration_type', $name);
+  }
+}
