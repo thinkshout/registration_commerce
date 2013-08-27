@@ -613,14 +613,6 @@ function registration_commerce_registration_currency_get($data, $info) {
 }
 
 /**
- * Implements hook_entity_delete().
  * 
- * We need to clean up this registration field ourselves because it isn't
- * happening otherwise, and creates strange results in our rules checking for
- * existing line items for registrations.
  */
-function registration_commerce_entity_delete($entity, $type) {
-  if ($type == 'commerce_line_item' && $entity->type == 'registration') {
-    db_delete(REGISTRATION_COMMERCE_FIELD, array('entity_id' => $entity->line_item_id));
-  }
 }
