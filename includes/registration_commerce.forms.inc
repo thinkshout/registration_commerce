@@ -51,7 +51,7 @@ function registration_commerce_registration_type_form($form, &$form_state, $regi
       array('@label' => $registration_type->label)),
     '#type' => 'checkboxes',
     '#options' => $options,
-    '#default_value' => $defaults['purchasable_states'],
+    '#default_value' => isset($defaults['purchasable_states']) ? $defaults['purchasable_states'] : array(),
   );
 
   $form['actions'] = array('#type' => 'actions');
