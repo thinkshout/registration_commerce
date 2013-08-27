@@ -117,6 +117,59 @@ function registration_commerce_commerce_line_item_type_info() {
 }
 
 /**
+ * Base line item definition for the registration line item type.
+ */
+function registration_commerce_line_item_configuration($line_item_type) {
+  $type = $line_item_type['type'];
+  if ($type == 'registration') {
+    // Create the product reference field for the line item type.
+    commerce_product_reference_create_instance('commerce_product', 'commerce_line_item', $type, t('Product'));
+
+    // Create the registration reference field for the line item type.
+    registration_commerce_registration_reference_create_instance(REGISTRATION_COMMERCE_FIELD, 'commerce_line_item', $type, t('Registration'));
+
+    // Look for or add a display path textfield to the product line item type.
+    $field_name = 'commerce_display_path';
+    $field = field_info_field($field_name);
+    $instance = field_info_instance('commerce_line_item', $field_name, $type);
+
+    if (empty($field)) {
+      $field = array(
+        'field_name' => $field_name,
+        'type' => 'text',
+        'cardinality' => 1,
+        'entity_types' => array('commerce_line_item'),
+        'translatable' => FALSE,
+        'locked' => TRUE,
+      );
+      $field = field_create_field($field);
+    }
+
+    if (empty($instance)) {
+      $instance = array(
+        'field_name' => $field_name,
+        'entity_type' => 'commerce_line_item',
+        'bundle' => $type,
+        'label' => t('Display path'),
+        'required' => TRUE,
+        'settings' => array(),
+        'widget' => array(
+          'type' => 'text_textfield',
+          'weight' => 0,
+        ),
+        'display' => array(
+          'display' => array(
+            'label' => 'hidden',
+            'weight' => 0,
+          ),
+        ),
+      );
+      field_create_instance($instance);
+    }
+  }
+}
+
+/**
  * Implements hook_entity_view().
  */
 function registration_commerce_entity_view($entity, $type, $view_mode, $langcode) {
