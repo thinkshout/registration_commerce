@@ -4,3 +4,4 @@ package = Registration
 core = 7.x
 
 dependencies[] = registration
+dependencies[] = commerce
