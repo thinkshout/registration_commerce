@@ -74,6 +74,7 @@ function registration_commerce_registration_type_form_submit($form, &$form_state
     'purchasable_states' => $form_state['values']['purchasable_states'],
   );
   $form_state['registration_type']->registration_commerce_settings = serialize($settings);
+  // @todo should we use ->save()?
   entity_save('registration_type', $form_state['registration_type']);
   drupal_set_message(t('Registration Commerce settings have been saved.'));
 }
