@@ -232,7 +232,7 @@ function registration_commerce_registration_submit($form, &$form_state) {
  */
 function registration_commerce_add_to_cart($registration) {
   if (registration_commerce_pay_access($registration)) {
-    $line_item = registration_commerce_line_item_new($registration, 1);
+    $line_item = registration_commerce_line_item_new($registration, $registration->count);
     return registration_commerce_cart_registration_add($GLOBALS['user']->uid, $line_item);
   }
 
