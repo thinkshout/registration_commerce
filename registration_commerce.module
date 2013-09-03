@@ -622,7 +622,8 @@ function registration_commerce_cart_registration_add($uid, $line_item) {
  */
 function registration_commerce_form_alter(&$form, &$form_state, $form_id) {
   // On the view cart page, disable the edit quantity field for registrations:
-  if ($form_id == 'views_form_commerce_cart_form_default') {
+  $cart_forms = array('views_form_commerce_cart_form_default', 'views_form_commerce_cart_form_custom_default');
+  if (in_array($form_id, $cart_forms)) {
     foreach ($form['edit_quantity'] as &$qty) {
       if (is_array($qty)) {
         $line_item = commerce_line_item_load($qty['#line_item_id']);
