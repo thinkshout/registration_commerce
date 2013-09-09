@@ -204,7 +204,7 @@ function registration_commerce_form_registration_form_alter(&$form, &$form_state
   $form['add_to_cart'] = array(
     '#type' => 'checkbox',
     '#title' => t('Add registration to cart and redirect to cart'),
-    '#default_value' => $form_state['registration']->is_new,
+    '#default_value' => isset($form_state['registration']->registration_id) ? FALSE : TRUE,
     '#weight' => 99,
     '#access' => user_access('edit any registration'),
   );
