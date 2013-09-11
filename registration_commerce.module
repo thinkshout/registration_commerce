@@ -174,23 +174,27 @@ function registration_commerce_line_item_configuration($line_item_type) {
  */
 function registration_commerce_entity_view($entity, $type, $view_mode, $langcode) {
   if ($type == 'registration') {
-    $wrapper = entity_metadata_wrapper('registration', $entity);
-    $price = $wrapper->price->value();
-    $price_markup = commerce_currency_format($price['amount'], $price['currency_code']);
-    $entity->content['price'] = array(
-      '#type' => 'item',
-      '#weight' => 98,
-      '#title' => t('Price'),
-      '#markup' => $price_markup,
-    );
-    if (registration_commerce_pay_access($entity)) {
-      $uri = entity_uri('registration', $entity);
-      $entity->content['pay_link'] = array(
-        '#weight' => 99,
-        '#markup' => l(t('Add registration to cart'), $uri['path'] . '/pay', array(
-          'attributes' => array('classes' => array('button')),
-        )),
+    $reg_type = registration_type_load($entity->type);
+    $reg_settings = unserialize($reg_type->registration_commerce_settings);
+    if ($reg_settings['enable']) {
+      $wrapper = entity_metadata_wrapper('registration', $entity);
+      $price = $wrapper->price->value();
+      $price_markup = commerce_currency_format($price['amount'], $price['currency_code']);
+      $entity->content['price'] = array(
+        '#type' => 'item',
+        '#weight' => 98,
+        '#title' => t('Price'),
+        '#markup' => $price_markup,
       );
+      if (registration_commerce_pay_access($entity)) {
+        $uri = entity_uri('registration', $entity);
+        $entity->content['pay_link'] = array(
+          '#weight' => 99,
+          '#markup' => l(t('Add registration to cart'), $uri['path'] . '/pay', array(
+            'attributes' => array('classes' => array('button')),
+          )),
+        );
+      }
     }
   }
 }
@@ -199,17 +203,22 @@ function registration_commerce_entity_view($entity, $type, $view_mode, $langcode
  * Implements hook_form_FORM_ID_alter().
  */
 function registration_commerce_form_registration_form_alter(&$form, &$form_state, $form_id) {
+  // @todo: check for appropriate triggering
+  $reg_type = registration_type_load($form['#bundle']);
+  $reg_settings = unserialize($reg_type->registration_commerce_settings);
   // If current user has extra permissions, let them opt out of adding to cart &
   // redirect:
-  $form['add_to_cart'] = array(
-    '#type' => 'checkbox',
-    '#title' => t('Add registration to cart and redirect to cart'),
-    '#default_value' => isset($form_state['registration']->registration_id) ? FALSE : TRUE,
-    '#weight' => 99,
-    '#access' => user_access('edit any registration'),
-  );
+  if ($reg_settings['enable']) {
+    $form['add_to_cart'] = array(
+      '#type' => 'checkbox',
+      '#title' => t('Add registration to cart and redirect to cart'),
+      '#default_value' => isset($form_state['registration']->registration_id) ? FALSE : TRUE,
+      '#weight' => 99,
+      '#access' => user_access('edit any registration'),
+    );
 
-  $form['#submit'][] = 'registration_commerce_registration_submit';
+    $form['#submit'][] = 'registration_commerce_registration_submit';
+  }
 }
 
 /**
@@ -247,6 +256,10 @@ function registration_commerce_pay_access($registration) {
 
   $settings = registration_commerce_get_settings($registration->type);
 
+  if (!isset($settings['enable']) || !$settings['enable']) {
+    return FALSE;
+  }
+
   $registration_price = $registration_wrapper->price->value();
   $user = $GLOBALS['user'];
   // If the registration state is pending payment, the parent event has a price.
@@ -267,7 +280,8 @@ function registration_commerce_pay_access($registration) {
  * Access callback to check for payment access based on user.
  * 
  * @todo: this is a pretty inflexible behavior, should probably be based on
- * some kind of permission: sensible behavior requires more thought.
+ * some kind of permission: sensible behavior requires more thought. Perhaps
+ * an option for "allow anonymous payment" should be set and checked here.
  */
 function registration_commerce_pay_page_access($registration) {
   // Require user to be logged in:
