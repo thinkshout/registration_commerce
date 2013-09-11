@@ -89,7 +89,7 @@ function registration_commerce_registration_type_form_validate($form, &$form_sta
 function registration_commerce_registration_type_form_submit($form, &$form_state) {
   $form_state['values']['price_defaults']['amount'] *= 100;
   $settings = array(
-    'enabled' => $form_state['values']['enable'],
+    'enable' => $form_state['values']['enable'],
     'price_defaults' => $form_state['values']['price_defaults'],
     'purchasable_states' => $form_state['values']['purchasable_states'],
   );
