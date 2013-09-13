@@ -3,5 +3,5 @@ description = Commerce integrations for registration module
 package = Registration
 core = 7.x
 
-dependencies[] = registration
-dependencies[] = commerce
+dependencies[] = registration (>=1.2)
+dependencies[] = commerce (>=1.8)
