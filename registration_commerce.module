@@ -632,6 +632,26 @@ function registration_commerce_cart_registration_add($uid, $line_item) {
 }
 
 /**
+ * Implements hook_entity_delete().
+ */
+function registration_commerce_entity_delete($entity, $type) {
+  if ($type == 'registration') {
+    // Check for related registration commerce line items and delete them.
+    $query = new EntityFieldQuery();
+    $query->entityCondition('entity_type', 'commerce_line_item')
+      ->entityCondition('bundle', 'registration')
+      ->fieldCondition(REGISTRATION_COMMERCE_FIELD, 'target_id', $entity->registration_id, '=')
+      ->addMetaData('account', user_load(1));
+    $result = $query->execute();
+    if (count($result)) {
+      $line_items = reset($result);
+      $line_item_ids = array_keys($line_items);
+      commerce_line_item_delete_multiple($line_item_ids);
+    }
+  }
+}
+
+/**
  * Implements hook_form_alter().
  */
 function registration_commerce_form_alter(&$form, &$form_state, $form_id) {
