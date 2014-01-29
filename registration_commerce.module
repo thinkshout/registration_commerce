@@ -328,7 +328,7 @@ function registration_commerce_line_item_title($line_item) {
   if ($registration = entity_metadata_wrapper('commerce_line_item', $line_item)->{REGISTRATION_COMMERCE_FIELD}->value()) {
     $registration_wrapper = entity_metadata_wrapper('registration', $registration);
     $label = entity_label($registration->entity_type, $registration_wrapper->entity->value());
-    return t('Registration !id for: !title', array('!id' => $registration->registration_id, '!title' => $label));
+    return t('Registration for: !title', array('!id' => $registration->registration_id, '!title' => $label));
   }
 }
 
