@@ -657,7 +657,7 @@ function registration_commerce_form_alter(&$form, &$form_state, $form_id) {
 function registration_commerce_registration_price_get($data, $info) {
   $result = module_invoke_all('registration_commerce_calculate_price', $data, $info);
   if (!isset($result['amount'])) {
-    $settings = registration_commerce_get_settings($registration->type);
+    $settings = registration_commerce_get_settings($data->type);
     $result = isset($settings['price_defaults']) ? $settings['price_defaults'] : array('amount' => 0, 'currency_code' => commerce_default_currency());
   }
   return $result;
