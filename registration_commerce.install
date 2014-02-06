@@ -56,6 +56,7 @@ function registration_commerce_schema_alter(&$schema) {
   $schema['registration_type']['fields']['registration_commerce_settings'] = array(
     'type' => 'blob',
     'default' => NULL,
+    'serialize' => TRUE,
     'description' => 'Configuration options for Registration Commerce.',
   );
 }
