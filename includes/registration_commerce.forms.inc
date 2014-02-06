@@ -14,7 +14,7 @@
 function registration_commerce_registration_type_form($form, &$form_state, $registration_type) {
   $form_state['registration_type'] = $registration_type;
   // Grab the existing settings and establish defaults:
-  $comreg_settings = unserialize($registration_type->registration_commerce_settings);
+  $comreg_settings = $registration_type->registration_commerce_settings;
 
   $form['enable'] = array(
     '#type' => 'checkbox',
@@ -93,7 +93,7 @@ function registration_commerce_registration_type_form_submit($form, &$form_state
     'price_defaults' => $form_state['values']['price_defaults'],
     'purchasable_states' => $form_state['values']['purchasable_states'],
   );
-  $form_state['registration_type']->registration_commerce_settings = serialize($settings);
+  $form_state['registration_type']->registration_commerce_settings = $settings;
   // @todo should we use ->save()?
   entity_save('registration_type', $form_state['registration_type']);
   drupal_set_message(t('Registration Commerce settings have been saved.'));

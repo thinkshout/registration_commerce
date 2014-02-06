@@ -175,7 +175,7 @@ function registration_commerce_line_item_configuration($line_item_type) {
 function registration_commerce_entity_view($entity, $type, $view_mode, $langcode) {
   if ($type == 'registration') {
     $reg_type = registration_type_load($entity->type);
-    $reg_settings = unserialize($reg_type->registration_commerce_settings);
+    $reg_settings = $reg_type->registration_commerce_settings;
     if ($reg_settings['enable']) {
       $wrapper = entity_metadata_wrapper('registration', $entity);
       $price = $wrapper->price->value();
@@ -205,7 +205,7 @@ function registration_commerce_entity_view($entity, $type, $view_mode, $langcode
 function registration_commerce_form_registration_form_alter(&$form, &$form_state, $form_id) {
   // @todo: check for appropriate triggering
   $reg_type = registration_type_load($form['#bundle']);
-  $reg_settings = unserialize($reg_type->registration_commerce_settings);
+  $reg_settings = $reg_type->registration_commerce_settings;
   // If current user has extra permissions, let them opt out of adding to cart &
   // redirect:
   if ($reg_settings['enable']) {
@@ -328,7 +328,7 @@ function registration_commerce_line_item_title($line_item) {
   if ($registration = entity_metadata_wrapper('commerce_line_item', $line_item)->{REGISTRATION_COMMERCE_FIELD}->value()) {
     $registration_wrapper = entity_metadata_wrapper('registration', $registration);
     $label = entity_label($registration->entity_type, $registration_wrapper->entity->value());
-    return t('Registration !id for: !title', array('!id' => $registration->registration_id, '!title' => $label));
+    return t('Registration for: !title', array('!id' => $registration->registration_id, '!title' => $label));
   }
 }
 
@@ -692,5 +692,5 @@ function registration_commerce_registration_currency_get($data, $info) {
 function registration_commerce_get_settings($registration_type) {
   $type_entities = entity_load('registration_type', array($registration_type));
   $type_entity = array_pop($type_entities);
-  return unserialize($type_entity->registration_commerce_settings);
+  return $type_entity->registration_commerce_settings;
 }
