@@ -47,6 +47,23 @@ function registration_commerce_registration_type_form($form, &$form_state, $regi
     '#options' => commerce_currency_code_options_list(),
     '#default_value' => isset($comreg_settings['price_defaults']['currency_code']) ? $comreg_settings['price_defaults']['currency_code'] : commerce_default_currency(),
   );
+
+  $fields = field_info_field_map();
+  $price_fields = array('' => '- none -');
+  foreach ($fields as $fid => $field) {
+    if ($field['type'] == "commerce_price") {
+      $price_fields[$fid] = $fid;
+    }
+  }
+  if (count($price_fields) > 1) {
+    $form['price_defaults']['field'] = array(
+      '#type' => 'select',
+      '#title' => t('Price Field'),
+      '#description' => t('Select the Price field that will specify the price on the Registration Host Entity. This allows each entity using this Registration Type to offer difference prices configured on creation. If present, this will override the values specified above.'),
+      '#options' => $price_fields,
+      '#default_value' => isset($comreg_settings['price_defaults']['field']) ? $comreg_settings['price_defaults']['field'] : '',
+    );
+  }
   // Load the current registration states to update the form options:
   $states = registration_get_states();
   $options = array();
