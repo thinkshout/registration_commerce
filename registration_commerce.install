@@ -31,7 +31,7 @@ function registration_commerce_enable() {
     $price = array(
       LANGUAGE_NONE => array(
         0 => array(
-          'amount' => 0,
+          'amount' => '0',
           'currency_code' => commerce_default_currency(),
         ),
       ),
