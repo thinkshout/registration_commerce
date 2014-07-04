@@ -34,19 +34,6 @@ function registration_commerce_registration_type_form($form, &$form_state, $regi
       ),
     ),
   );
-  $form['price_defaults']['amount'] = array(
-    '#type' => 'textfield',
-    '#title' => t('Amount'),
-    '#size' => 10,
-    '#default_value' => isset($comreg_settings['price_defaults']['amount']) ? $comreg_settings['price_defaults']['amount'] / 100 : 0,
-    '#element_validate' => array('element_validate_number'),
-  );
-  $form['price_defaults']['currency_code'] = array(
-    '#type' => 'select',
-    '#title' => t('Currency'),
-    '#options' => commerce_currency_code_options_list(),
-    '#default_value' => isset($comreg_settings['price_defaults']['currency_code']) ? $comreg_settings['price_defaults']['currency_code'] : commerce_default_currency(),
-  );
 
   $fields = field_info_field_map();
   $price_fields = array('' => '- none -');
@@ -64,15 +51,35 @@ function registration_commerce_registration_type_form($form, &$form_state, $regi
       '#default_value' => isset($comreg_settings['price_defaults']['field']) ? $comreg_settings['price_defaults']['field'] : '',
     );
   }
+
+  $form['price_defaults']['amount'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Amount'),
+    '#description' => 'Amount and currency will only be used if the Price Field does not provide a valid value.',
+    '#size' => 10,
+    '#default_value' => isset($comreg_settings['price_defaults']['amount']) ? $comreg_settings['price_defaults']['amount'] / 100 : 0,
+    '#element_validate' => array('element_validate_number'),
+  );
+  $form['price_defaults']['currency_code'] = array(
+    '#type' => 'select',
+    '#title' => t('Currency'),
+    '#options' => commerce_currency_code_options_list(),
+    '#default_value' => isset($comreg_settings['price_defaults']['currency_code']) ? $comreg_settings['price_defaults']['currency_code'] : commerce_default_currency(),
+  );
+
   // Load the current registration states to update the form options:
   $states = registration_get_states();
   $options = array();
   foreach ($states as $name => $state) {
     $options[$name] = $state->label;
+    if ($state->default_state){
+      $options[$name] .= ' <i>(default state)</i>';
+    }
   }
   $form['purchasable_states'] = array(
     '#title' => t('Which states should allow for a purchase on @label registrations?',
       array('@label' => $registration_type->label)),
+    '#description' => 'If you select the default state, registrants will be immediately directed to their shopping cart upon submitting their registration.',
     '#type' => 'checkboxes',
     '#options' => $options,
     '#default_value' => isset($comreg_settings['purchasable_states']) ? $comreg_settings['purchasable_states'] : array(),
