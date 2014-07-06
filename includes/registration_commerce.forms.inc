@@ -72,7 +72,7 @@ function registration_commerce_registration_type_form($form, &$form_state, $regi
   $options = array();
   foreach ($states as $name => $state) {
     $options[$name] = $state->label;
-    if ($state->default_state){
+    if ($state->default_state) {
       $options[$name] .= ' <i>(default state)</i>';
     }
   }
@@ -104,7 +104,17 @@ function registration_commerce_registration_type_form($form, &$form_state, $regi
  * Validation callback for registration_form().
  */
 function registration_commerce_registration_type_form_validate($form, &$form_state) {
-  // Unused.
+  if ($form_state['input']['enable']) {
+    $count = 0;
+    foreach ($form_state['input']['purchasable_states'] as $state) {
+      if ($state) {
+        $count++;
+      }
+    }
+    if (!$count) {
+      form_set_error('purchasable_states', "Your registration type is not payable until you make it payable in at least one state.");
+    }
+  }
 }
 
 /**
