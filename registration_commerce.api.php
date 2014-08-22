@@ -18,6 +18,6 @@
 function hook_registration_commerce_calculate_price($registration, $info) {
   return array(
     'amount' => 42,
-    'currency' => 'USD',
+    'currency_code' => 'USD',
   );
 }
